@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriveNow - Vehicle Collection</title>
+    <style>
+        /* ===== CSS RESET & BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #34d399;
+            --secondary-color: #f59e0b;
+            --accent-color: #06b6d4;
+            --text-dark: #1f2937;
+            --text-gray: #6b7280;
+            --bg-light: #f0fdf4;
+            --bg-white: #ffffff;
+            --bg-gradient-start: #064e3b;
+            --bg-gradient-end: #10b981;
+            --border-color: #d1fae5;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            background-color: var(--bg-white);
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: var(--shadow-sm);
+            z-index: 1000;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .contact-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.625rem 1rem;
+            border: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            text-decoration: none;
+        }
+
+        .contact-button:active { transform: scale(0.98); }
+
+        .contact-button svg { width: 18px; height: 18px; }
+        .contact-button svg path { stroke: white; }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-toggle svg { width: 24px; height: 24px; }
+        .menu-toggle .menu-icon path { stroke: var(--primary-color); stroke-width: 2; }
+        .menu-toggle .close-icon { display: none; }
+        .menu-toggle.active .menu-icon { display: none; }
+        .menu-toggle.active .close-icon { display: block; }
+        .menu-toggle.active .close-icon path { stroke: var(--primary-color); stroke-width: 2.5; }
+
+        .nav-menu {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .nav-menu.active { opacity: 1; visibility: visible; }
+
+        .nav-menu-content {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 2.5rem 2rem;
+            max-width: 90%;
+            width: 340px;
+            box-shadow: var(--shadow-xl);
+            transform: scale(0.8);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu.active .nav-menu-content { transform: scale(1); opacity: 1; }
+
+        .menu-close-button {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            background: var(--bg-light);
+            border: none;
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .menu-close-button:active { background: var(--border-color); }
+        .menu-close-button svg { width: 20px; height: 20px; }
+        .menu-close-button svg path { stroke: var(--primary-color); stroke-width: 2.5; }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 0.875rem 1rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            transition: background-color 0.2s ease;
+            font-weight: 500;
+            font-size: 1.05rem;
+        }
+
+        .nav-links a:active { background-color: var(--bg-light); }
+        .nav-links a.active-link {
+            background-color: var(--bg-light);
+            color: var(--primary-color);
+        }
+
+        /* ===== PAGE HERO ===== */
+        .page-hero {
+            margin-top: 64px;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            color: white;
+            padding: 3rem 1.25rem 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 150px; height: 4px;
+            background: white;
+        }
+
+        .page-hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 150px; height: 4px;
+            background: var(--secondary-color);
+        }
+
+        .page-hero-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .breadcrumb a:hover { opacity: 1; }
+        .breadcrumb span { opacity: 0.5; }
+
+        .page-hero h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-hero p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .collection-wrapper {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2.5rem 1.25rem;
+        }
+
+        /* ===== SEARCH & FILTER BAR ===== */
+        .search-filter-bar {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .search-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-input-wrapper svg {
+            position: absolute;
+            left: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px; height: 18px;
+            color: var(--text-gray);
+            pointer-events: none;
+        }
+
+        .search-input-wrapper svg path { stroke: var(--text-gray); stroke-width: 2; }
+
+        .search-input {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 2.75rem;
+            border: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            color: var(--text-dark);
+            background: var(--bg-light);
+            min-height: 48px;
+        }
+
+        .search-input::placeholder { color: var(--text-gray); }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+            background: white;
+        }
+
+        .search-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.875rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: background-color 0.2s, transform 0.2s;
+            min-height: 48px;
+            white-space: nowrap;
+        }
+
+        .search-btn:hover { background: var(--primary-dark); }
+        .search-btn:active { transform: scale(0.98); }
+
+        /* ===== TAG FILTER SYSTEM ===== */
+        .filter-groups {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .filter-options-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .filter-group-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            color: var(--text-gray);
+            min-width: 90px;
+        }
+
+        .filter-option-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.35rem 0.75rem;
+            border: 1.5px solid var(--border-color);
+            background: var(--bg-light);
+            color: var(--text-dark);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 999px;
+            transition: all 0.18s ease;
+            user-select: none;
+        }
+
+        .filter-option-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: white;
+        }
+
+        .filter-option-btn:hover .plus-icon {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .filter-option-btn.selected {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .filter-option-btn.selected .plus-icon {
+            background: rgba(255,255,255,0.25);
+            color: white;
+        }
+
+        .plus-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--border-color);
+            color: var(--text-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            line-height: 1;
+            flex-shrink: 0;
+            transition: all 0.18s;
+        }
+
+        /* Active filters bubbles row */
+        .active-filters-row {
+            display: none;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+            padding-top: 0.875rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 0.25rem;
+        }
+
+        .active-filters-row.has-filters {
+            display: flex;
+        }
+
+        .active-filter-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            color: var(--text-gray);
+        }
+
+        .filter-bubble {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.3rem 0.5rem 0.3rem 0.75rem;
+            background: var(--text-dark);
+            color: white;
+            font-size: 0.78rem;
+            font-weight: 600;
+            border-radius: 999px;
+            animation: bubbleIn 0.2s ease both;
+        }
+
+        @keyframes bubbleIn {
+            from { opacity: 0; transform: scale(0.75); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        .bubble-remove {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            padding: 0;
+            transition: background 0.15s;
+            flex-shrink: 0;
+        }
+
+        .bubble-remove:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+        .clear-filters-btn {
+            background: none;
+            border: 1.5px solid var(--border-color);
+            color: var(--text-gray);
+            padding: 0.3rem 0.75rem;
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        .clear-filters-btn:hover {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        /* ===== CATEGORY TABS ===== */
+        .category-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .category-tabs::-webkit-scrollbar { display: none; }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 0.875rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-gray);
+            cursor: pointer;
+            white-space: nowrap;
+            position: relative;
+            transition: color 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab-btn::after {
+            content: attr(data-count);
+            background: var(--border-color);
+            color: var(--text-gray);
+            font-size: 0.7rem;
+            padding: 0.1rem 0.4rem;
+            margin-left: 0.4rem;
+            font-weight: 700;
+            border-radius: 999px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover { color: var(--primary-color); }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-btn.active::after {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* ===== RESULTS INFO ===== */
+        .results-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .results-count {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+        }
+
+        .results-count strong {
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .sort-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sort-label {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sort-select {
+            padding: 0.5rem 0.875rem;
+            border: 1px solid var(--border-color);
+            font-size: 0.875rem;
+            color: var(--text-dark);
+            background: white;
+            cursor: pointer;
+        }
+
+        .sort-select:focus { outline: none; border-color: var(--primary-color); }
+
+        /* ===== CARS GRID ===== */
+        .cars-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        /* ===== CAR CARD ===== */
+        .car-card {
+            background: white;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 4px solid var(--primary-color);
+            position: relative;
+        }
+
+        .car-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: var(--primary-color);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .car-card:hover::before { opacity: 1; }
+        .car-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .car-card:active { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+
+        .car-badge {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            background: var(--text-dark);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.25rem 0.625rem;
+            text-transform: uppercase;
+            letter-spacing: 0.75px;
+            z-index: 1;
+        }
+
+        .car-badge.available {
+            background: var(--primary-color);
+        }
+
+        .car-badge.transport {
+            background: var(--accent-color);
+        }
+
+        .car-badge.utility {
+            background: var(--secondary-color);
+            color: var(--text-dark);
+        }
+
+        .car-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .car-content {
+            padding: 1.5rem;
+        }
+
+        .car-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .car-category {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .car-features {
+            display: flex;
+            gap: 1.25rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .feature {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.8rem;
+            color: var(--text-gray);
+            font-weight: 500;
+        }
+
+        .feature-icon {
+            width: 36px; height: 36px;
+            padding: 6px;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-icon svg { width: 100%; height: 100%; }
+        .feature-icon svg path { stroke: white; stroke-width: 2; }
+
+        .car-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 2px solid var(--bg-light);
+        }
+
+        .car-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .car-price span {
+            font-size: 0.875rem;
+            font-weight: 400;
+            color: var(--text-gray);
+        }
+
+        .rent-button {
+            background: var(--text-dark);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .rent-button:hover { background: var(--primary-color); }
+        .rent-button:active { transform: scale(0.98); }
+
+        /* ===== NO RESULTS ===== */
+        .no-results {
+            text-align: center;
+            padding: 4rem 2rem;
+            display: none;
+        }
+
+        .no-results-icon {
+            width: 64px; height: 64px;
+            background: var(--bg-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+
+        .no-results-icon svg { width: 32px; height: 32px; }
+        .no-results-icon svg path { stroke: var(--primary-color); stroke-width: 1.5; }
+
+        .no-results h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .no-results p { color: var(--text-gray); }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: var(--text-dark);
+            color: white;
+            padding: 2.5rem 1.25rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            max-width: 1280px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .footer-section h3 { font-size: 1.125rem; font-weight: 700; margin-bottom: 1rem; }
+
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.75rem; }
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .footer-links a:hover { color: var(--primary-light); }
+
+        .contact-info { display: flex; flex-direction: column; gap: 0.75rem; }
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.875rem;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 767px) {
+            .search-row { flex-direction: column; }
+            .search-btn { width: 100%; }
+            .filter-group-label { min-width: 70px; font-size: 0.65rem; }
+        }
+
+        @media (min-width: 768px) {
+            .menu-toggle { display: none; }
+            .contact-button { display: none; }
+
+            .nav-menu {
+                position: static;
+                background: transparent;
+                backdrop-filter: none;
+                display: block;
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .nav-menu-content {
+                background: transparent;
+                box-shadow: none;
+                padding: 0;
+                max-width: none;
+                width: auto;
+                transform: none;
+                opacity: 1;
+            }
+
+            .menu-close-button { display: none; }
+
+            .nav-links {
+                flex-direction: row;
+                margin-top: 0;
+            }
+
+            .nav-links a:hover { background-color: var(--bg-light); }
+
+            .cars-grid { grid-template-columns: repeat(2, 1fr); }
+
+            .footer-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (min-width: 1024px) {
+            .cars-grid { grid-template-columns: repeat(3, 1fr); }
+            .footer-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        /* ===== CARD HIDDEN STATE ===== */
+        .car-card.hidden {
+            display: none;
+        }
+
+        /* Animate in */
+        .car-card {
+            animation: fadeInUp 0.35s ease both;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <nav class="nav">
+            <a href="/domov.html" class="logo">
+                <div class="logo-icon">D</div>
+                <span>DriveNow</span>
+            </a>
+
+            <div class="nav-actions">
+                <a href="#contact" class="contact-button">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M3 5.5C3 14.0604 9.93959 21 18.5 21C18.8862 21 19.2691 20.9859 19.6483 20.9581C20.0834 20.9262 20.3009 20.9103 20.499 20.7963C20.663 20.7019 20.8185 20.5345 20.9007 20.364C21 20.1582 21 19.9181 21 19.438V16.6207C21 16.2169 21 16.015 20.9335 15.842C20.8749 15.6891 20.7795 15.553 20.6559 15.4456C20.516 15.324 20.3262 15.255 19.9468 15.117L16.74 13.9509C16.2985 13.7904 16.0777 13.7101 15.8683 13.7237C15.6836 13.7357 15.5059 13.7988 15.3549 13.9058C15.1837 14.0271 15.0629 14.2285 14.8212 14.6314L14 16C11.3501 14.7999 9.2019 12.6489 8 10L9.36863 9.17882C9.77145 8.93713 9.97286 8.81628 10.0942 8.64506C10.2012 8.49408 10.2643 8.31637 10.2763 8.1317C10.2899 7.92227 10.2096 7.70153 10.0491 7.26005L8.88299 4.05321C8.745 3.67376 8.67601 3.48403 8.55442 3.3441C8.44701 3.22049 8.31089 3.12515 8.15802 3.06645C7.98496 3 7.78308 3 7.37932 3H4.56201C4.08188 3 3.84181 3 3.63598 3.09925C3.4655 3.18146 3.29814 3.33701 3.2037 3.50103C3.08968 3.69907 3.07375 3.91662 3.04189 4.35173C3.01413 4.73086 3 5.11378 3 5.5Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Contact</span>
+                </a>
+
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                    <svg class="menu-icon" viewBox="0 0 24 24" fill="none">
+                        <path d="M3.5 10H6.5V7H3.5V10Z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M3.5 17H6.5V14H3.5V17Z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M10.5 10H13.5V7H10.5V10Z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M10.5 17H13.5V14H10.5V17Z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M17.5 10H20.5V7H17.5V10Z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M17.5 17H20.5V14H17.5V17Z" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="nav-menu" id="navMenu">
+                <div class="nav-menu-content">
+                    <ul class="nav-links">
+                        <li><a href="vozidla.html" class="active-link">Cars</a></li>
+                        <li><a href="/domov.html#location">Find Us</a></li>
+                        <li><a href="/domov.html#benefits">Why Us</a></li>
+                        <li><a href="/domov.html#testimonials">Reviews</a></li>
+                        <li><a href="/domov.html#contact">Contact</a></li>
+                    </ul>
+                    <button class="menu-close-button" id="menuCloseBtn" aria-label="Close menu">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M6 6L18 18M18 6L6 18" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- PAGE HERO -->
+    <section class="page-hero">
+        <div class="page-hero-inner">
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <a href="/domov.html">Home</a>
+                <span>›</span>
+                <span>Vehicles</span>
+            </nav>
+            <h1>Our Vehicle Collection</h1>
+            <p>Browse all available cars, vans, and utility vehicles — ready to rent today.</p>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <div class="collection-wrapper">
+
+        <!-- SEARCH & FILTER BAR -->
+        <div class="search-filter-bar">
+            <div class="search-row">
+                <div class="search-input-wrapper">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M21 21L16.514 16.506M19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search by name or type...">
+                </div>
+                <button class="search-btn" id="searchBtn">Search</button>
+            </div>
+            <div class="filter-groups">
+
+                <!-- Fuel -->
+                <div class="filter-options-row">
+                    <span class="filter-group-label">Fuel</span>
+                    <button class="filter-option-btn" data-group="fuel" data-value="petrol">
+                        <span class="plus-icon">+</span> Petrol
+                    </button>
+                    <button class="filter-option-btn" data-group="fuel" data-value="diesel">
+                        <span class="plus-icon">+</span> Diesel
+                    </button>
+                    <button class="filter-option-btn" data-group="fuel" data-value="electric">
+                        <span class="plus-icon">+</span> Electric
+                    </button>
+                </div>
+
+                <!-- Transmission -->
+                <div class="filter-options-row">
+                    <span class="filter-group-label">Gearbox</span>
+                    <button class="filter-option-btn" data-group="transmission" data-value="auto">
+                        <span class="plus-icon">+</span> Automatic
+                    </button>
+                    <button class="filter-option-btn" data-group="transmission" data-value="manual">
+                        <span class="plus-icon">+</span> Manual
+                    </button>
+                </div>
+
+                <!-- Seats -->
+                <div class="filter-options-row">
+                    <span class="filter-group-label">Seats</span>
+                    <button class="filter-option-btn" data-group="seats" data-value="2">
+                        <span class="plus-icon">+</span> 2 Seats
+                    </button>
+                    <button class="filter-option-btn" data-group="seats" data-value="5">
+                        <span class="plus-icon">+</span> 5 Seats
+                    </button>
+                    <button class="filter-option-btn" data-group="seats" data-value="7">
+                        <span class="plus-icon">+</span> 7+ Seats
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Active filter bubbles -->
+            <div class="active-filters-row" id="activeFiltersRow">
+                <span class="active-filter-label">Active:</span>
+                <div id="bubblesContainer" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;"></div>
+                <button class="clear-filters-btn" id="clearBtn">✕ Clear all</button>
+            </div>
+        </div>
+
+        <!-- CATEGORY TABS -->
+        <div class="category-tabs" role="tablist">
+            <button class="tab-btn active" data-category="all" data-count="6" role="tab">All Vehicles</button>
+            <button class="tab-btn" data-category="personal" data-count="4" role="tab">Personal</button>
+            <button class="tab-btn" data-category="transport" data-count="1" role="tab">Transport</button>
+            <button class="tab-btn" data-category="utility" data-count="1" role="tab">Utility</button>
+        </div>
+
+        <!-- RESULTS INFO + SORT -->
+        <div class="results-info">
+            <div class="results-count">Showing <strong id="resultCount">6</strong> vehicles</div>
+            <div class="sort-wrapper">
+                <span class="sort-label">Sort:</span>
+                <select class="sort-select" id="sortSelect">
+                    <option value="default">Default</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="name">Name A–Z</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- CARS GRID -->
+        <div class="cars-grid" id="carsGrid">
+
+            <!-- Card 1: Audi A4 -->
+            <article class="car-card"
+                data-category="personal"
+                data-fuel="petrol"
+                data-transmission="auto"
+                data-seats="5"
+                data-price="89"
+                data-name="Audi A4">
+                <span class="car-badge available">Available</span>
+                <img src="/auta/audia4/fotky/fotka.webp" alt="Audi A4" class="car-image">
+                <div class="car-content">
+                    <h3 class="car-title">Audi A4</h3>
+                    <p class="car-category">Executive Sedan · Personal</p>
+                    <div class="car-features">
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 16C10.6193 16 9.5 17.1193 9.5 18.5C9.5 19.8807 10.6193 21 12 21C13.3807 21 14.5 19.8807 14.5 18.5C14.5 17.1193 13.3807 16 12 16ZM12 16V12M5.5 8C6.88071 8 8 6.88071 8 5.5C8 4.11929 6.88071 3 5.5 3C4.11929 3 3 4.11929 3 5.5C3 6.88071 4.11929 8 5.5 8ZM5.5 8V8.8C5.5 9.92011 5.5 10.4802 5.71799 10.908C5.90973 11.2843 6.21569 11.5903 6.59202 11.782C7.01984 12 7.57989 12 8.7 12H15.3C16.4201 12 16.9802 12 17.408 11.782C17.7843 11.5903 18.0903 11.2843 18.282 10.908C18.5 10.4802 18.5 9.92011 18.5 8.8V8M18.5 8C19.8807 8 21 6.88071 21 5.5C21 4.11929 19.8807 3 18.5 3C17.1193 3 16 4.11929 16 5.5C16 6.88071 17.1193 8 18.5 8Z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <span>Auto</span>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 18L14 18M17 15V21M7.68213 14C8.63244 14.6318 9.77319 15 10.9999 15C11.7012 15 12.3744 14.8797 13 14.6586M10.5 21H5.6C5.03995 21 4.75992 21 4.54601 20.891C4.35785 20.7951 4.20487 20.6422 4.10899 20.454C4 20.2401 4 19.9601 4 19.4V17C4 15.3431 5.34315 14 7 14H7.5M15 7C15 9.20914 13.2091 11 11 11C8.79086 11 7 9.20914 7 7C7 4.79086 8.79086 3 11 3C13.2091 3 15 4.79086 15 7Z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <span>5 Seats</span>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M14 8V5M11 5H17M6 12H3M3 9V15M21 11V19M9 12H9.01M12 12H12.01M15 12H15.01M6 8V16H8L10 19H18V10L16 8H6Z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <span>Petrol</span>
+                        </div>
+                    </div>
+                    <div class="car-footer">
+                        <div class="car-price">$89<span>/day</span></div>
+                        <a href="/auta/audia4/vozidlo.html" class="rent-button">Rent Now</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Card 2: BMW X4 -->
+            <article class="car-card"
+                data-category="personal"
+                data-fuel="diesel"
+                data-transmission="auto"
+                data-seats="5"
+                data-price="129"
+                data-name="BMW X4">
+                <span class="car-badge available">Available</span>
+                <img src="/auta/bmwx4/fotky/fotka.webp" alt="BMW X4" class="car-image">
+                <div class="car-content">
+                    <h3 class="car-title">BMW X4</h3>
+                    <p class="car-category">Sports Activity Coupé · Personal</p>
+                    <div class="car-features">
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 16C10.6193 16 9.5 17.1193 9.5 18.5C9.5 19.8807 10.6193 21 12 21C13.3807 21 14.5 19.8807 14.5 18.5C14.5 17.1193 13.3807 16 12 16ZM12 16V12M5.5 8C6.88071 8 8 6.88071 8 5.5C8 4.11929 6.88071 3 5.5 3C4.11929 3 3 4.11929 3 5.5C3 6.88071 4.11929 8 5.5 8ZM5.5 8V8.8C5.5 9.92011 5.5 10.4802 5.71799 10.908C5.90973 11.2843 6.21569 11.5903 6.59202 11.782C7.01984 12 7.57989 12 8.7 12H15.3C16.4201 12 16.9802 12 17.408 11.782C17.7843 11.5903 18.0903 11.2843 18.282 10.908C18.5 10.4802 18.5 9.92011 18.5 8.8V8M18.5 8C19.8807 8 21 6.88071 21 5.5C21 4.11929 19.8807 3 18.5 3C17.1193 3 16 4.11929 16 5.5C16 6.88071 17.1193 8 18.5 8Z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <span>Auto</span>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 18L14 18M17 15V21M7.68213 14C8.63244 14.6318 9.77319 15 10.9999 15C11.7012 15 12.3744 14.8797 13 14.6586M10.5 21H5.6C5.03995 21 4.75992 21 4.54601 20.891C4.35785 20.7951 4.20487 20.6422 4.10899 20.454C4 20.2401 4 19.9601 4 19.4V17C4 15.3431 5.34315 14 7 14H7.5M15 7C15 9.20914 13.2091 11 11 11C8.79086 11 7 9.20914 7 7C7 4.79086 8.79086 3 11 3C13.2091 3 15 4.79086 15 7Z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <span>5 Seats</span>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M14 8V5M11 5H17M6 12H3M3 9V15M21 11V19M9 12H9.01M12 12H12.01M15 12H15.01M6 8V16H8L10 19H18V10L16 8H6Z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <span>Diesel</span>
+                        </div>
+                    </div>
+                    <div class="car-footer">
+                        <div class="car-price">$129<span>/day</span></div>
+                        <a href="/auta/bmwx4/vozidlo.html" class="rent-button">Rent Now</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Card 3: Skoda Octavia 1 -->
+            <article class="car-card"
+                data-category="personal"
+                data-fuel="petrol"
+                data-transmission="manual"
+                data-seats="5"
+                data-price="49"
+                data-name="Skoda Octavia">
+                <span class="car-badge available">Available</span>
+                <img src="/auta/octavia1/fotky/fotka.webp" alt="Skoda Octavia" class="car-image">
+                <div class="car-content">
+                    <h3 class="car-title">Škoda Octavia</h3>
+                    <p class="car-category">Family Hatchback · Personal</p>
+                    <div class="car-features">
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 16C10.6193 16 9.5 17.1193 9.5 18.5C9.5 19.8807 10.6193 21 12 21C13.3807 21 14.5 19.8807 14.5 18.5C14.5 17.1193 13.3807 16 12 16ZM12 16V12M5.5 8C6.88071 8 8 6.88071 8 5.5C8 4.11929 6.88071 3 5.5 3C4.11929 3 3 4.11929 3 5.5C3 6.88071 4.11929 8 5.5 8ZM5.5 8V8.8C5.5 9.92011 5.5 10.4802 5.71799 10.908C5.90973 11.2843 6.21569 11.5903 6.59202 11.782C7.01984 12 7.57989 12 8.7 12H15.3C16.4201 12 16.9802 12 17.408 11.782C17.7843 11.5903 18.0903 11.2843 18.282 10.908C18.5 10.4802 18.5 9.92011 18.5 8.8V8M18.5 8C19.8807 8 21 6.88071 21 5.5C21 4.11929 19.8807 3 18.5 3C17.1193 3 16 4.11929 16 5.5C16 6.88071 17.1193 8 18.5 8Z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <span>Manual</span>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 18L14 18M17 15V21M7.68213 14C8.63244 14.6318 9.77319 15 10.9999 15C11.7012 15 12.3744 14.8797 13 14.6586M10.5 21H5.6C5.03995 21 4.75992 21 4.54601 20.891C4.35785 20.7951 4.20487 20.6422 4.10899 20.454C4 20.2401 4 19.9601 4 19.4V17C4 15.3431 5.34315 14 7 14H7.5M15 7C15 9.20914 13.2091 11 11 11C8.79086 11 7 9.20914 7 7C7 4.79086 8.79086 3 11 3C13.2091 3 15 4.79086 15 7Z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <span>5 Seats</span>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M14 8V5M11 5H17M6 12H3M3 9V15M21 11V19M9 12H9.01M12 12H12.01M15 12H15.01M6 8V16H8L10 19H18V10L16 8H6Z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <span>Petrol</span>
+                        </div>
+                    </div>
+                    <div class="car-footer">
+                        <div class="car-price">$49<span>/day</span></div>
+                        <a href="/auta/octavia1/vozidlo.html" class="rent-button">Rent Now</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Card 4: Skoda Octavia 2 -->
+            <article class="car-card"
+                data-category="personal"
+                data-fuel="diesel"
+                data-transmission="auto"
+                data-seats="5"
+                data-price="59"
+                data-name="Skoda Octavia RS">
+                <span class="car-badge available">Available</span>
+                <img src="/auta/octavia2/fotky/fotka.webp" alt="Skoda Octavia RS" class="car-image">
+                <div class="car-content">
+                    <h3 class="car-title">Škoda Octavia RS</h3>
+                    <p class="car-category">Sports Hatchback · Personal</p>
+                    <div class="car-features">
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 16C10.6193 16 9.5 17.1193 9.5 18.5C9.5 19.8807 10.6193 21 12 21C13.3807 21 14.5 19.8807 14.5 18.5C14.5 17.1193 13.3807 16 12 16ZM12 16V12M5.5 8C6.88071 8 8 6.88071 8 5.5C8 4.11929 6.88071 3 5.5 3C4.11929 3 3 4.11929 3 5.5C3 6.88071 4.11929 8 5.5 8ZM5.5 8V8.8C5.5 9.92011 5.5 10.4802 5.71799 10.908C5.90973 11.2843 6.21569 11.5903 6.59202 11.782C7.01984 12 7.57989 12 8.7 12H15.3C16.4201 12 16.9802 12 17.408 11.782C17.7843 11.5903 18.0903 11.2843 18.282 10.908C18.5 10.4802 18.5 9.92011 18.5 8.8V8M18.5 8C19.8807 8 21 6.88071 21 5.5C21 4.11929 19.8807 3 18.5 3C17.1193 3 16 4.11929 16 5.5C16 6.88071 17.1193 8 18.5 8Z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <span>Auto</span>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 18L14 18M17 15V21M7.68213 14C8.63244 14.6318 9.77319 15 10.9999 15C11.7012 15 12.3744 14.8797 13 14.6586M10.5 21H5.6C5.03995 21 4.75992 21 4.54601 20.891C4.35785 20.7951 4.20487 20.6422 4.10899 20.454C4 20.2401 4 19.9601 4 19.4V17C4 15.3431 5.34315 14 7 14H7.5M15 7C15 9.20914 13.2091 11 11 11C8.79086 11 7 9.20914 7 7C7 4.79086 8.79086 3 11 3C13.2091 3 15 4.79086 15 7Z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <span>5 Seats</span>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M14 8V5M11 5H17M6 12H3M3 9V15M21 11V19M9 12H9.01M12 12H12.01M15 12H15.01M6 8V16H8L10 19H18V10L16 8H6Z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <span>Diesel</span>
+                        </div>
+                    </div>
+                    <div class="car-footer">
+                        <div class="car-price">$59<span>/day</span></div>
+                        <a href="/auta/octavia2/vozidlo.html" class="rent-button">Rent Now</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Card 5: Skoda Octavia RS (octaviars) -->
+            <article class="car-card"
+                data-category="transport"
+                data-fuel="diesel"
+                data-transmission="auto"
+                data-seats="7"
+                data-price="79"
+                data-name="Skoda Octavia Combi">
+                <span class="car-badge transport">Transport</span>
+                <img src="/auta/octaviars/fotky/fotka.webp" alt="Skoda Octavia Combi" class="car-image">
+                <div class="car-content">
+                    <h3 class="car-title">Škoda Octavia Combi</h3>
+                    <p class="car-category">Estate Wagon · Transport</p>
+                    <div class="car-features">
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 16C10.6193 16 9.5 17.1193 9.5 18.5C9.5 19.8807 10.6193 21 12 21C13.3807 21 14.5 19.8807 14.5 18.5C14.5 17.1193 13.3807 16 12 16ZM12 16V12M5.5 8C6.88071 8 8 6.88071 8 5.5C8 4.11929 6.88071 3 5.5 3C4.11929 3 3 4.11929 3 5.5C3 6.88071 4.11929 8 5.5 8ZM5.5 8V8.8C5.5 9.92011 5.5 10.4802 5.71799 10.908C5.90973 11.2843 6.21569 11.5903 6.59202 11.782C7.01984 12 7.57989 12 8.7 12H15.3C16.4201 12 16.9802 12 17.408 11.782C17.7843 11.5903 18.0903 11.2843 18.282 10.908C18.5 10.4802 18.5 9.92011 18.5 8.8V8M18.5 8C19.8807 8 21 6.88071 21 5.5C21 4.11929 19.8807 3 18.5 3C17.1193 3 16 4.11929 16 5.5C16 6.88071 17.1193 8 18.5 8Z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <span>Auto</span>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 18L14 18M17 15V21M7.68213 14C8.63244 14.6318 9.77319 15 10.9999 15C11.7012 15 12.3744 14.8797 13 14.6586M10.5 21H5.6C5.03995 21 4.75992 21 4.54601 20.891C4.35785 20.7951 4.20487 20.6422 4.10899 20.454C4 20.2401 4 19.9601 4 19.4V17C4 15.3431 5.34315 14 7 14H7.5M15 7C15 9.20914 13.2091 11 11 11C8.79086 11 7 9.20914 7 7C7 4.79086 8.79086 3 11 3C13.2091 3 15 4.79086 15 7Z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <span>7 Seats</span>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M14 8V5M11 5H17M6 12H3M3 9V15M21 11V19M9 12H9.01M12 12H12.01M15 12H15.01M6 8V16H8L10 19H18V10L16 8H6Z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <span>Diesel</span>
+                        </div>
+                    </div>
+                    <div class="car-footer">
+                        <div class="car-price">$79<span>/day</span></div>
+                        <a href="/auta/octaviars/vozidlo.html" class="rent-button">Rent Now</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Card 6: Vivaro -->
+            <article class="car-card"
+                data-category="utility"
+                data-fuel="diesel"
+                data-transmission="manual"
+                data-seats="3"
+                data-price="95"
+                data-name="Opel Vivaro">
+                <span class="car-badge utility">Utility</span>
+                <img src="/auta/vivaro/fotky/fotka.jpg" alt="Opel Vivaro" class="car-image">
+                <div class="car-content">
+                    <h3 class="car-title">Opel Vivaro</h3>
+                    <p class="car-category">Cargo Van · Utility</p>
+                    <div class="car-features">
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 16C10.6193 16 9.5 17.1193 9.5 18.5C9.5 19.8807 10.6193 21 12 21C13.3807 21 14.5 19.8807 14.5 18.5C14.5 17.1193 13.3807 16 12 16ZM12 16V12M5.5 8C6.88071 8 8 6.88071 8 5.5C8 4.11929 6.88071 3 5.5 3C4.11929 3 3 4.11929 3 5.5C3 6.88071 4.11929 8 5.5 8ZM5.5 8V8.8C5.5 9.92011 5.5 10.4802 5.71799 10.908C5.90973 11.2843 6.21569 11.5903 6.59202 11.782C7.01984 12 7.57989 12 8.7 12H15.3C16.4201 12 16.9802 12 17.408 11.782C17.7843 11.5903 18.0903 11.2843 18.282 10.908C18.5 10.4802 18.5 9.92011 18.5 8.8V8M18.5 8C19.8807 8 21 6.88071 21 5.5C21 4.11929 19.8807 3 18.5 3C17.1193 3 16 4.11929 16 5.5C16 6.88071 17.1193 8 18.5 8Z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <span>Manual</span>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 18L14 18M17 15V21M7.68213 14C8.63244 14.6318 9.77319 15 10.9999 15C11.7012 15 12.3744 14.8797 13 14.6586M10.5 21H5.6C5.03995 21 4.75992 21 4.54601 20.891C4.35785 20.7951 4.20487 20.6422 4.10899 20.454C4 20.2401 4 19.9601 4 19.4V17C4 15.3431 5.34315 14 7 14H7.5M15 7C15 9.20914 13.2091 11 11 11C8.79086 11 7 9.20914 7 7C7 4.79086 8.79086 3 11 3C13.2091 3 15 4.79086 15 7Z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <span>3 Seats</span>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M14 8V5M11 5H17M6 12H3M3 9V15M21 11V19M9 12H9.01M12 12H12.01M15 12H15.01M6 8V16H8L10 19H18V10L16 8H6Z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <span>Diesel</span>
+                        </div>
+                    </div>
+                    <div class="car-footer">
+                        <div class="car-price">$95<span>/day</span></div>
+                        <a href="/auta/vivaro/vozidlo.html" class="rent-button">Rent Now</a>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+
+        <!-- NO RESULTS -->
+        <div class="no-results" id="noResults">
+            <div class="no-results-icon">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M21 21L16.514 16.506M19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <h3>No vehicles found</h3>
+            <p>Try adjusting your search or filters to find what you're looking for.</p>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer" id="contact">
+        <div class="container" style="max-width:1280px;margin:0 auto;">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>DriveNow</h3>
+                    <p style="color: rgba(255,255,255,0.8); margin-top: 0.5rem;">Your trusted partner for premium car rentals.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="vozidla.html">Browse Cars</a></li>
+                        <li><a href="/domov.html#location">Find Us</a></li>
+                        <li><a href="/domov.html#benefits">Why Us</a></li>
+                        <li><a href="/domov.html#testimonials">Reviews</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <div class="contact-info">
+                        <div class="contact-item"><span>📞</span><span>1-800-DRIVE-NOW</span></div>
+                        <div class="contact-item"><span>✉️</span><span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="8fe6e1e9e0cfebfde6f9eae1e0f8a1ece0e2">[email&#160;protected]</a></span></div>
+                        <div class="contact-item"><span>📍</span><span>Oslobodenia 928, Trstená</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 DriveNow. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        // ===== MOBILE MENU =====
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navMenu');
+        const menuCloseBtn = document.getElementById('menuCloseBtn');
+
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+        menuCloseBtn.addEventListener('click', () => {
+            menuToggle.classList.remove('active');
+            navMenu.classList.remove('active');
+        });
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.classList.remove('active');
+                navMenu.classList.remove('active');
+            });
+        });
+        navMenu.addEventListener('click', e => {
+            if (e.target === navMenu) {
+                menuToggle.classList.remove('active');
+                navMenu.classList.remove('active');
+            }
+        });
+
+        // ===== FILTERING & SEARCH =====
+        const cards = Array.from(document.querySelectorAll('.car-card'));
+        const searchInput = document.getElementById('searchInput');
+        const sortSelect = document.getElementById('sortSelect');
+        const resultCount = document.getElementById('resultCount');
+        const noResults = document.getElementById('noResults');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const filterOptionBtns = document.querySelectorAll('.filter-option-btn');
+        const activeFiltersRow = document.getElementById('activeFiltersRow');
+        const bubblesContainer = document.getElementById('bubblesContainer');
+        let activeCategory = 'all';
+        // Each group holds a Set of selected values — allows multiple selections per group
+        const activeFilters = { fuel: new Set(), transmission: new Set(), seats: new Set() };
+
+        const labelMap = {
+            petrol: 'Petrol', diesel: 'Diesel', electric: 'Electric',
+            auto: 'Automatic', manual: 'Manual',
+            '2': '2 Seats', '5': '5 Seats', '7': '7+ Seats'
+        };
+
+        function toggleFilter(group, value, btn) {
+            if (activeFilters[group].has(value)) {
+                activeFilters[group].delete(value);
+                btn.classList.remove('selected');
+                btn.querySelector('.plus-icon').textContent = '+';
+            } else {
+                activeFilters[group].add(value);
+                btn.classList.add('selected');
+                btn.querySelector('.plus-icon').textContent = '✓';
+            }
+            renderBubbles();
+            applyFilters();
+        }
+
+        function renderBubbles() {
+            bubblesContainer.innerHTML = '';
+            let any = false;
+            Object.entries(activeFilters).forEach(([group, valueSet]) => {
+                valueSet.forEach(value => {
+                    any = true;
+                    const bubble = document.createElement('span');
+                    bubble.className = 'filter-bubble';
+                    bubble.innerHTML = `${labelMap[value] || value}<button class="bubble-remove" data-group="${group}" data-value="${value}" title="Remove">✕</button>`;
+                    bubblesContainer.appendChild(bubble);
+                });
+            });
+            activeFiltersRow.classList.toggle('has-filters', any);
+            bubblesContainer.querySelectorAll('.bubble-remove').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const g = btn.dataset.group;
+                    const v = btn.dataset.value;
+                    activeFilters[g].delete(v);
+                    const optBtn = document.querySelector(`.filter-option-btn[data-group="${g}"][data-value="${v}"]`);
+                    if (optBtn) { optBtn.classList.remove('selected'); optBtn.querySelector('.plus-icon').textContent = '+'; }
+                    renderBubbles();
+                    applyFilters();
+                });
+            });
+        }
+
+        filterOptionBtns.forEach(btn => {
+            btn.addEventListener('click', () => toggleFilter(btn.dataset.group, btn.dataset.value, btn));
+        });
+
+        function applyFilters() {
+            const search = searchInput.value.toLowerCase().trim();
+            const fuelSet = activeFilters.fuel;
+            const transSet = activeFilters.transmission;
+            const seatsSet = activeFilters.seats;
+            let visible = [];
+            cards.forEach(card => {
+                const name = card.dataset.name.toLowerCase();
+                const cardFuel = card.dataset.fuel;
+                const cardTrans = card.dataset.transmission;
+                const cardSeats = parseInt(card.dataset.seats);
+                const cardCat = card.dataset.category;
+                let show = true;
+                if (activeCategory !== 'all' && cardCat !== activeCategory) show = false;
+                if (search && !name.includes(search)) show = false;
+                // OR logic: card must match at least one selected value in each active group
+                if (fuelSet.size > 0 && !fuelSet.has(cardFuel)) show = false;
+                if (transSet.size > 0 && !transSet.has(cardTrans)) show = false;
+                if (seatsSet.size > 0) {
+                    const seatsMatch = [...seatsSet].some(s => {
+                        if (s === '7') return cardSeats >= 7;
+                        return cardSeats === parseInt(s);
+                    });
+                    if (!seatsMatch) show = false;
+                }
+                if (show) visible.push(card);
+            });
+            const sortVal = sortSelect.value;
+            if (sortVal === 'price-asc') visible.sort((a,b) => parseInt(a.dataset.price) - parseInt(b.dataset.price));
+            else if (sortVal === 'price-desc') visible.sort((a,b) => parseInt(b.dataset.price) - parseInt(a.dataset.price));
+            else if (sortVal === 'name') visible.sort((a,b) => a.dataset.name.localeCompare(b.dataset.name));
+            cards.forEach(c => { c.classList.add('hidden'); c.style.animationDelay = ''; });
+            visible.forEach((c, i) => { c.classList.remove('hidden'); c.style.animationDelay = `${i * 0.05}s`; });
+            resultCount.textContent = visible.length;
+            noResults.style.display = visible.length === 0 ? 'block' : 'none';
+        }
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeCategory = btn.dataset.category;
+                applyFilters();
+            });
+        });
+
+        searchInput.addEventListener('input', applyFilters);
+        document.getElementById('searchBtn').addEventListener('click', applyFilters);
+        sortSelect.addEventListener('change', applyFilters);
+
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            searchInput.value = '';
+            sortSelect.value = 'default';
+            activeFilters.fuel.clear();
+            activeFilters.transmission.clear();
+            activeFilters.seats.clear();
+            filterOptionBtns.forEach(b => { b.classList.remove('selected'); b.querySelector('.plus-icon').textContent = '+'; });
+            activeCategory = 'all';
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabBtns[0].classList.add('active');
+            renderBubbles();
+            applyFilters();
+        });
+
+        applyFilters();    </script>
+</body>
+</html>
